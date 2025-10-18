@@ -7,4 +7,4 @@
 **Number of AI Auditors:** 5 Major Platforms
 ** Claude AI, ChatGPT (OpenAI), Gemini AI (Google), Grok AI (xAI), and DeepSeek AI.
 
-**[5-AI Audit Report](./AIauditResults.md)**: Comprehensive security audit
+**[5-AI Audit Report](./AIauditResult.md)**: Comprehensive security audit
