@@ -146,6 +146,7 @@ uint256 private constant PRECISION_DIVISOR = 10000;
    - Reserve fee: 7.5 BPS (0.075%) if burning active, 15 BPS (0.15%) if burning complete
 4. Remaining UTR amount used to calculate BNB refund at 99.9% backing rate
 5. BNB transferred to user at calculated rate
+6. Refund price automatically follows backing price growth - users always benefit from accumulated reserves
 
 ## 🌐 Decentralization & Accessibility
 
@@ -203,3 +204,4 @@ REFLEXUS Protocol uses BNB (Binance Coin) as its backing asset but is **NOT** af
 **Reflexus Protocol UTR Token** - *The future of tokenomics is here*
 
 *Revolutionary Web3 token with mathematically guaranteed price growth and 99.9% liquidity backing*
+
