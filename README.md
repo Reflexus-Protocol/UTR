@@ -28,12 +28,12 @@ REFLEXUS Protocol presents UTR, a BSC-compliant token that merges native currenc
 - **Users will always buy UTRs back at higher price after refunding**
 - Creates one-way upward price pressure that benefits all holders
 - Refund process: Send UTR tokens to contract → Receive BNB back
-- Price automatically increases due to reduced circulating supply
+- Price automatically increases as BNB reserves grow faster than circulating supply
 
 ### Continuous Price Growth with 99.9% Liquidity
-- **Buy Price**: Refund price × 1.001 (0.1% premium)
+- **Buy Price**: Refund price + 0.1% premium
 - **Refund Price**: (BNB reserves × 99.9%) ÷ circulating supply
-- As BNB accumulates and circulating supply decreases, both prices rise
+- As BNB accumulates and circulating supply increases, price still rises due to reserve growth
 - Always maintains 99.9% backing against circulating supply
 
 ### Fair Dividend Distribution
@@ -56,7 +56,7 @@ REFLEXUS Protocol presents UTR, a BSC-compliant token that merges native currenc
 - **Total Supply**: 1,250,000,000 UTR (Fixed supply with no minting capability)
 - **Burn Limit**: 250,000,000 UTR (20% of total supply)
 - **Base Price**: 0.0001 BNB/UTR (Starting price with dynamic adjustment)
-- **Interest Share**: 0.05% - 0.10% per interaction distributed proportionally
+- **Reflection Fees**: 5-10 BPS per transaction distributed as dividends
 
 ### Fee Structure (25 BPS Total)
 | Transaction Type | Dev Fee | Interest Fee | Reserve Fee | Burn Fee | Total |
@@ -123,21 +123,29 @@ uint256 private constant PRECISION_DIVISOR = 10000;
 
 ### Price Growth Cycle
 1. User buys UTR tokens → BNB added to contract reserves
-2. Circulating supply decreases → Refund price increases
-3. Next buy price = Refund price × 1.001 (0.1% premium)
-4. Cycle repeats → Continuous upward price pressure
+2. Circulating supply INCREASES → More tokens in circulation
+3. Next buy price = Current refund price + 0.1% premium
+4. Refund price = Contract BNB balance ÷ Circulating supply
+5. As BNB reserves grow faster than circulating supply → Price increases
 
 ### Dividend Distribution
-1. Transaction fees accumulate in dividend pool
-2. Dividends distributed proportionally based on token holdings
+1. Transaction fees (reflection fees) accumulate in dividend pool
+2. Dividends distributed proportionally based on token holdings in circulating supply
 3. Users claim dividends manually via `claimDividends()` function
-4. All distributed dividends are fully backed UTR tokens
+4. All distributed dividends are fully backed UTR tokens from contract reserves
+5. Contracts are excluded from dividend distribution and claiming
+6. Dividends accumulate automatically but must be claimed manually
 
 ### Refund Process
 1. User transfers UTR tokens to contract address
 2. Contract calculates refund value at 99.9% of backing
-3. Fees applied: dev (5 BPS), dividend (5 BPS), burn/reserve (15 BPS)
-4. BNB transferred to user at calculated rate
+3. Fees applied on UTR amount BEFORE refund calculation:
+   - Dev fee: 5 BPS (0.05%)
+   - Dividend fee: 5 BPS (0.05%)
+   - Burn fee: 7.5 BPS (0.075%) - only if burning limit not reached
+   - Reserve fee: 7.5 BPS (0.075%) if burning active, 15 BPS (0.15%) if burning complete
+4. Remaining UTR amount used to calculate BNB refund at 99.9% backing rate
+5. BNB transferred to user at calculated rate
 
 ## 🌐 Decentralization & Accessibility
 
@@ -155,7 +163,7 @@ uint256 private constant PRECISION_DIVISOR = 10000;
 
 ## 📚 Documentation
 
-- **[5-AI Audit Report](./5-AI%20Audit/AIauditResult.md)**: Comprehensive security audit
+- **[5-AI Audit Report](./5-AIAudit/AIauditResult.md)**: Comprehensive security audit
 - **[Vulnerability Audit Report](./VulnerabilityAudit.md)**: Comprehensive security analysis
 - **[Economic Protection Mechanisms](./EconomicProtectionMechanisms.md)**: Detailed economic design explanation
 - **[White Paper](./whitepaper.md)**: Complete technical and economic documentation
@@ -195,6 +203,3 @@ REFLEXUS Protocol uses BNB (Binance Coin) as its backing asset but is **NOT** af
 **Reflexus Protocol UTR Token** - *The future of tokenomics is here*
 
 *Revolutionary Web3 token with mathematically guaranteed price growth and 99.9% liquidity backing*
-
-
-
