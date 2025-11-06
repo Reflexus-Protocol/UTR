@@ -71,14 +71,16 @@ Transparent and sustainable token economics designed for long-term value creatio
 - **Base Price:** 0.0001 BNB/UTR (Starting price with dynamic adjustment)
 - **Interest Share:** 0.05% - 0.10% (Per interaction distributed proportionally)
 
-### Fee Structure (Basis Points)
+### Fee Structure (Percentages)
+
+*Note: 100 BPS = 1%*
 
 | Transaction Type | Interest Fee | Reserve Fee | Burn Fee | Dev Fee | Total Fee |
 |-----------------|--------------|-------------|----------|---------|-----------|
-| Buy             | 10 BPS       | 10 BPS      | -        | 5 BPS    | 25 BPS    |
-| Refund          | 5 BPS        | 7.5-15 BPS  | 7.5-0 BPS| 5 BPS    | 25 BPS    |
-| Transfer        | 10 BPS       | 10 BPS      | -        | 5 BPS    | 25 BPS    |
-| DEX Swap        | 10 BPS       | 10 BPS      | -        | 5 BPS    | 25 BPS    |
+| Buy             | 0.10%        | 0.10%       | -        | 0.05%    | 0.25%     |
+| Refund          | 0.05%        | 0.075%-0.15%| 0.075%-0%| 0.05%    | 0.25%     |
+| Transfer        | 0.10%        | 0.10%       | -        | 0.05%    | 0.25%     |
+| DEX Swap        | 0.10%        | 0.10%       | -        | 0.05%    | 0.25%     |
 
 ## Appendix A — Deep Fee Explanation
 
@@ -88,10 +90,10 @@ The fee structure in REFLEXUS Protocol is thoughtfully designed to foster ecosys
 
 ### How Fees Work Across Transaction Types:
 
-#### Reserve Fee (7.5–15 BPS):
+#### Reserve Fee (0.075%–0.15%):
 Takes a portion of UTR tokens from refunds and keeps them in the contract's balance, effectively removing them from circulation. These reserve tokens remain in the contract and are not actively sold back to the market. The mechanism works by: (1) removing tokens from circulation through reserve fees, (2) refunds paying out BNB from the contract's reserves, and (3) the remaining circulating supply having higher backing value per token. This creates a price floor that prevents downward manipulation and maintains backing value integrity without requiring external market interventions.
 
-#### Dividend Fee (5–10 BPS):
+#### Dividend Fee (0.05%–0.10%):
 The engine of interest distribution. This fee accumulates in the dividend pool and is distributed proportionally to all holders based on their token balance. For example, in a transfer:
 
 ```solidity
@@ -102,14 +104,14 @@ totalDividendsDistributed += dividendFee;
 
 When claimed, dividends are distributed to holders based on their proportional share of the total supply, akin to fair dividend payments that can be claimed manually by paying gas fees.
 
-#### Dev Fee (5 BPS across all types):
+#### Dev Fee (0.05% across all types):
 A small portion allocated to the dev address for maintenance and ecosystem development. It is transferred via `_performTransfer(address(this), devAddress, devFee);`, ensuring transparent funding without external dependence.
 
 ### Forced Growth via Burn and Reserve Accumulation:
 
 **Backing and Forced Growth:** Backing value only goes up through the forced growth mechanism: Buy premiums (0.1%) and reserve fees (0.1-0.15%) net positive BNB inflows. Burns on refunds enforce deflation (supply down → value up), with reserves stabilizing the curve. No external dependencies, purely internal. Every interaction where fees are taken (buys, transfers, DEX swaps, and refunds) includes a reserve fee that allocates UTR tokens back to the contract's balance. This reserve fee removes UTR tokens from market circulation and returns them to the contract's balance, where they remain as part of the contract's token holdings. The forced growth occurs through the reduction of circulating supply (via burns and reserve accumulation) combined with stable or increasing BNB reserves, not through active selling of reserve tokens.
 
-During refunds specifically, the mechanism applies four fees: dev fee (5 BPS), dividend fee (5 BPS), burn fee (7.5 BPS when below burn limit, 0 when at limit), and reserve fee (7.5 BPS when below burn limit, 15 BPS when at limit). The burn fee permanently removes UTR tokens from circulation (up to 20% of total supply), while the reserve fee keeps tokens in the contract's balance, removing them from circulation. This combination of refunds (which pay out BNB), burning (which reduces total supply), and reserve fees (which remove tokens from circulation) ensures that the backing value per remaining UTR token increases, creating a price floor that prevents downward manipulation and maintains backing value integrity. The reserve tokens remain in the contract as part of its holdings and are not actively sold back to the market. This is fundamentally different from dividend interest, which distribute rewards without affecting the underlying backing value.
+During refunds specifically, the mechanism applies four fees: dev fee (0.05%), dividend fee (0.05%), burn fee (0.075% when below burn limit, 0% when at limit), and reserve fee (0.075% when below burn limit, 0.15% when at limit). The burn fee permanently removes UTR tokens from circulation (up to 20% of total supply), while the reserve fee keeps tokens in the contract's balance, removing them from circulation. This combination of refunds (which pay out BNB), burning (which reduces total supply), and reserve fees (which remove tokens from circulation) ensures that the backing value per remaining UTR token increases, creating a price floor that prevents downward manipulation and maintains backing value integrity. The reserve tokens remain in the contract as part of its holdings and are not actively sold back to the market. This is fundamentally different from dividend interest, which distribute rewards without affecting the underlying backing value.
 
 ### Interest Distribution via Dividends:
 
@@ -124,15 +126,15 @@ Dividends represent interest payments to holders, where transaction fees are red
 Refunds allow users to return UTR for native currency, but the actual payout is less than 99.9% of backing value due to fees. The refund process uses `effectiveBacking = balance * 999 / 1000` as the reference rate, but applies four fees to the UTR amount before conversion, resulting in a lower net payout. This is handled in `_handleRefund`, applying four different fees before payout:
 
 ```solidity
-uint256 devFeeUTR = Math.mulDiv(utrAmount, REFUND_DEV_FEE_BPS, 10000); // 5 BPS
-uint256 dividendFeeUTR = Math.mulDiv(utrAmount, REFUND_REFLECTION_FEE_BPS, 10000); // 5 BPS
-uint256 burnFeeUTR = (_totalBurned < BURNING_LIMIT) ? Math.mulDiv(utrAmount, 75, 100000) : 0; // 7.5 BPS or 0
-uint256 reserveFeeUTR = (_totalBurned < BURNING_LIMIT) ? Math.mulDiv(utrAmount, 75, 100000) : Math.mulDiv(utrAmount, 150, 100000); // 7.5 or 15 BPS
+uint256 devFeeUTR = Math.mulDiv(utrAmount, REFUND_DEV_FEE_BPS, 10000); // 0.05%
+uint256 dividendFeeUTR = Math.mulDiv(utrAmount, REFUND_REFLECTION_FEE_BPS, 10000); // 0.05%
+uint256 burnFeeUTR = (_totalBurned < BURNING_LIMIT) ? Math.mulDiv(utrAmount, 75, 100000) : 0; // 0.075% or 0%
+uint256 reserveFeeUTR = (_totalBurned < BURNING_LIMIT) ? Math.mulDiv(utrAmount, 75, 100000) : Math.mulDiv(utrAmount, 150, 100000); // 0.075% or 0.15%
 uint256 utrForUserRefund = utrAmount - devFeeUTR - dividendFeeUTR - burnFeeUTR - reserveFeeUTR;
 uint256 grossNativeValue = (utrForUserRefund * effectiveBacking) / currentCirculatingSupply;
 ```
 
-- **How It Works:** The refund mechanism applies four fees to the UTR amount before conversion: dev fee (5 BPS), dividend fee (5 BPS), burn fee (7.5 BPS when below burn limit, 0 when at limit), and reserve fee (7.5 BPS when below burn limit, 15 BPS when at limit). Only the remaining UTR tokens (after fee deduction) are converted to BNB at 99.9% of backing value. For example, if you refund 1000 UTR tokens, approximately 750 UTR tokens (after ~25% in fees) are converted to BNB. Burn fees permanently remove tokens from circulation (up to 20% of total supply), while reserve fees keep tokens in the contract. This "forced" recycling ensures refunds contribute to growth (via burns reducing supply and dividends distributing interest rewards) rather than draining liquidity.
+- **How It Works:** The refund mechanism applies four fees to the UTR amount before conversion: dev fee (0.05%), dividend fee (0.05%), burn fee (0.075% when below burn limit, 0% when at limit), and reserve fee (0.075% when below burn limit, 0.15% when at limit). Only the remaining UTR tokens (after fee deduction) are converted to BNB at 99.9% of backing value. For example, if you refund 1000 UTR tokens, approximately 997.5 UTR tokens (after ~0.25% in fees) are converted to BNB. Burn fees permanently remove tokens from circulation (up to 20% of total supply), while reserve fees keep tokens in the contract. This "forced" recycling ensures refunds contribute to growth (via burns reducing supply and dividends distributing interest rewards) rather than draining liquidity.
 - **Unique vs. Normal Market:** Most tokens lack direct refunds; exits occur via DEX sells, risking slippage and impermanent loss. UTR's on-chain refunds provide guaranteed liquidity at a fair price, backed by reserves accumulated from fees, unlike rug-prone projects or stablecoins with collateral risks (e.g., USDT's off-chain reserves). The 99.9% reference rate prevents arbitrage exploits, while the burn cap (20% of total supply) avoids over-deflation, maintaining balance between scarcity and liquidity. Note that actual refund payouts are reduced by fees before conversion to BNB.
 
 In summary, UTR's fees create a virtuous cycle: transactions fund growth (dividends), stability (reserves), and scarcity (burns), all within a backed framework. This is special because it transforms fees from a cost (as in normal markets) into a mechanism for enforced holder value, without the hype-driven volatility of meme coins or the complexity of layered DeFi protocols.
@@ -200,9 +202,9 @@ function _buy(address buyer, uint256 amountNative) private nonReentrant {
     if (utrToPurchase == 0) revert InsufficientNative();
     if (tokensSold + utrToPurchase > TOTAL_SUPPLY) revert InsufficientBalance();
 
-    uint256 devFee = Math.mulDiv(utrToPurchase, BUY_DEV_FEE_BPS, 10000); // 5 BPS
-    uint256 reserveFee = Math.mulDiv(utrToPurchase, BUY_RESERVE_FEE_BPS, 10000); // 10 BPS
-    uint256 dividendFee = Math.mulDiv(utrToPurchase, BUY_REFLECTION_FEE_BPS, 10000); // 10 BPS
+    uint256 devFee = Math.mulDiv(utrToPurchase, BUY_DEV_FEE_BPS, 10000); // 0.05%
+    uint256 reserveFee = Math.mulDiv(utrToPurchase, BUY_RESERVE_FEE_BPS, 10000); // 0.10%
+    uint256 dividendFee = Math.mulDiv(utrToPurchase, BUY_REFLECTION_FEE_BPS, 10000); // 0.10%
     uint256 utrToUser;
     unchecked {
         utrToUser = utrToPurchase - devFee - reserveFee - dividendFee;
@@ -270,10 +272,10 @@ function _handleRefund(address sender, uint256 utrAmount) private nonReentrant {
 
     uint256 _totalBurned = totalBurned;
 
-    uint256 devFeeUTR = Math.mulDiv(utrAmount, REFUND_DEV_FEE_BPS, 10000); // 5 BPS
-    uint256 dividendFeeUTR = Math.mulDiv(utrAmount, REFUND_REFLECTION_FEE_BPS, 10000); // 5 BPS
-    uint256 burnFeeUTR = (_totalBurned < BURNING_LIMIT) ? Math.mulDiv(utrAmount, 75, 100000) : 0; // 7.5 BPS or 0
-    uint256 reserveFeeUTR = (_totalBurned < BURNING_LIMIT) ? Math.mulDiv(utrAmount, 75, 100000) : Math.mulDiv(utrAmount, 150, 100000); // 7.5 or 15 BPS
+    uint256 devFeeUTR = Math.mulDiv(utrAmount, REFUND_DEV_FEE_BPS, 10000); // 0.05%
+    uint256 dividendFeeUTR = Math.mulDiv(utrAmount, REFUND_REFLECTION_FEE_BPS, 10000); // 0.05%
+    uint256 burnFeeUTR = (_totalBurned < BURNING_LIMIT) ? Math.mulDiv(utrAmount, 75, 100000) : 0; // 0.075% or 0%
+    uint256 reserveFeeUTR = (_totalBurned < BURNING_LIMIT) ? Math.mulDiv(utrAmount, 75, 100000) : Math.mulDiv(utrAmount, 150, 100000); // 0.075% or 0.15%
     
     uint256 utrForUserRefund;
     unchecked {
